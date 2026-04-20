@@ -14,6 +14,33 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # plná historie pro auto-gen release notes
+
+      - name: Create draft release with auto-generated notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Vytvoř draft release a nech GitHub vygenerovat notes z commitů
+          gh release create "${{ github.ref_name }}" \
+            --title "MD Editor ${{ github.ref_name }}" \
+            --generate-notes \
+            --draft
+
+          # Přidej na začátek statické instrukce k instalaci
+          cat > /tmp/install.md <<'INSTALL_EOF'
+          ## Instalace
+
+          1. Stáhni `.dmg` níže.
+          2. Otevři ho a přetáhni MD Editor do Applications.
+          3. **Při prvním spuštění**: klikni na appku pravým tlačítkem → **Open** → v dialogu znovu **Open**. (Appka není notarizovaná u Apple, proto ten extra krok.)
+
+          Pro macOS 11+ na Apple Silicon (M1/M2/M3/M4).
+
+          INSTALL_EOF
+
+          gh release view "${{ github.ref_name }}" --json body --jq .body >> /tmp/install.md
+          gh release edit "${{ github.ref_name }}" --notes-file /tmp/install.md
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -34,21 +61,16 @@ jobs:
       - name: Install JS dependencies
         run: npm ci
 
-      - name: Build and release
+      - name: Build and upload assets
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tagName: ${{ github.ref_name }}
-          releaseName: 'MD Editor ${{ github.ref_name }}'
-          releaseBody: |
-            ## Instalace
-
-            1. Stáhni `.dmg` níže.
-            2. Otevři ho a přetáhni MD Editor do Applications.
-            3. **Při prvním spuštění**: klikni na appku pravým tlačítkem → **Open** → v dialogu znovu **Open**. (Appka není notarizovaná u Apple, proto ten extra krok.)
-
-            Pro macOS 11+ na Apple Silicon (M1/M2/M3/M4).
-          releaseDraft: false
-          prerelease: false
+          releaseDraft: true
           args: --target aarch64-apple-darwin
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release edit "${{ github.ref_name }}" --draft=false
