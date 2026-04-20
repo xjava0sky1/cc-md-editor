@@ -1,6 +1,6 @@
 {
   "name": "cc-dm-editor",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Native macOS Markdown editor built with Tauri",
   "private": true,
   "type": "module",

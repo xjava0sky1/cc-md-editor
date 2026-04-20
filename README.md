@@ -43,6 +43,21 @@ Výsledný `.dmg` najdeš v `src-tauri/target/release/bundle/dmg/`.
 
 Pro vývoj: `npm run dev` (spustí appku s hot-reloadem frontendu).
 
+## Vydání nové verze (pro maintainera)
+
+Release je plně automatizovaný přes GitHub Actions. Stačí jeden příkaz:
+
+```bash
+./scripts/release.sh 0.2.0
+```
+
+Skript zvýší verzi v `package.json` i `src-tauri/tauri.conf.json`, commitne, vytvoří tag `v0.2.0` a pushne ho. GitHub Actions pak ~5–10 minut staví `.dmg` na macOS runneru a vytvoří Release s přiloženým buildem. Sleduj průběh v záložce [Actions](../../actions).
+
+Podmínky:
+- Pracovní adresář musí být čistý (žádné necommitované změny).
+- Verze ve formátu `X.Y.Z` (např. `0.2.0`, `1.0.0`).
+- `gh` CLI přihlášené (`gh auth status`).
+
 ## Licence
 
 Private project.
