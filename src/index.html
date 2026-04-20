@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MD Editor</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="titlebar" data-tauri-drag-region></header>
+
+  <nav class="toolbar">
+    <button class="tb" data-action="h1" title="Heading 1">H1</button>
+    <button class="tb" data-action="h2" title="Heading 2">H2</button>
+    <button class="tb" data-action="h3" title="Heading 3">H3</button>
+    <span class="sep"></span>
+    <button class="tb" data-action="bold" title="Bold (⌘B)"><b>B</b></button>
+    <button class="tb" data-action="italic" title="Italic (⌘I)"><i>I</i></button>
+    <button class="tb" data-action="code" title="Inline code">&lt;/&gt;</button>
+    <button class="tb" data-action="link" title="Link (⌘K)">↗</button>
+    <span class="sep"></span>
+    <button class="tb" data-action="list" title="Bulleted list">•—</button>
+    <button class="tb" data-action="quote" title="Blockquote">❝</button>
+    <button class="tb" data-action="table" title="Insert table">▦</button>
+    <button class="tb" data-action="hr" title="Horizontal rule">―</button>
+    <span class="spacer"></span>
+    <button class="tb" id="btn-open" title="Open (⌘O)">Open</button>
+    <button class="tb" id="btn-save" title="Save (⌘S)">Save</button>
+    <button class="tb" id="btn-close" title="Close tab (⌘W)">Close</button>
+  </nav>
+
+  <div class="tabbar" id="tabbar" role="tablist"></div>
+
+  <main class="split">
+    <textarea id="editor" spellcheck="false" placeholder="# Start typing…"></textarea>
+    <div id="preview" class="markdown-body" contenteditable="true" spellcheck="false"></div>
+    <div id="find-bar" class="find-bar hidden" role="search">
+      <input id="find-input" type="text" placeholder="Find" spellcheck="false" autocomplete="off" />
+      <span id="find-count" class="find-count">0/0</span>
+      <button id="find-prev" class="find-btn" title="Previous (Shift+Enter)">↑</button>
+      <button id="find-next" class="find-btn" title="Next (Enter)">↓</button>
+      <button id="find-close" class="find-btn" title="Close (Esc)">✕</button>
+    </div>
+  </main>
+
+  <footer class="stats">
+    <span id="stat-path" class="muted"></span>
+    <span class="spacer"></span>
+    <span>Words: <b id="stat-words">0</b></span>
+    <span>Chars: <b id="stat-chars">0</b></span>
+    <span>Lines: <b id="stat-lines">1</b></span>
+  </footer>
+
+  <script type="module" src="bundle.js"></script>
+</body>
+</html>

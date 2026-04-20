@@ -1,0 +1,54 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "MD Editor",
+  "version": "0.1.0",
+  "identifier": "com.vaclavjavansky.mdeditor",
+  "build": {
+    "frontendDist": "../dist",
+    "beforeDevCommand": "npm run watch:js",
+    "beforeBuildCommand": "npm run build:js"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "MD Editor",
+        "width": 1200,
+        "height": 800,
+        "minWidth": 700,
+        "minHeight": 400,
+        "resizable": true,
+        "fullscreen": false,
+        "titleBarStyle": "Overlay",
+        "hiddenTitle": true,
+        "dragDropEnabled": true
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' ipc: http://ipc.localhost"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["app", "dmg"],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "fileAssociations": [
+      {
+        "ext": ["md", "markdown"],
+        "name": "Markdown Document",
+        "description": "Markdown source file",
+        "role": "Editor",
+        "mimeType": "text/markdown"
+      }
+    ],
+    "macOS": {
+      "minimumSystemVersion": "11.0"
+    }
+  }
+}

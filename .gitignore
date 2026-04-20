@@ -1,0 +1,18 @@
+# Node
+node_modules/
+
+# Build output
+dist/
+src/bundle.js
+
+# Rust / Tauri
+src-tauri/target/
+
+# macOS
+.DS_Store
+
+# Claude Code local settings
+.claude/
+
+# Tauri generated schema
+src-tauri/gen/schemas/
