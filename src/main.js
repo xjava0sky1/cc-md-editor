@@ -66,6 +66,10 @@ function setDirty(flag) {
 
 function renderPreview() {
   preview.innerHTML = DOMPurify.sanitize(marked.parse(editor.value || ""));
+  if (findBar && !findBar.classList.contains("hidden") && findInput.value) {
+    applyPreviewHighlights(findInput.value);
+    updateActiveHighlight();
+  }
 }
 
 function updateStats() {
@@ -446,6 +450,11 @@ editor.addEventListener("input", () => {
   renderPreview();
   updateStats();
   setDirty(true);
+  if (!findBar.classList.contains("hidden")) updateFind();
+});
+
+editor.addEventListener("scroll", () => {
+  editorHighlight.scrollTop = editor.scrollTop;
 });
 
 let previewSyncTimer = null;
@@ -453,13 +462,20 @@ let previewDirty = false;
 
 function syncPreviewToEditor() {
   try {
-    const md = turndown.turndown(preview.innerHTML);
+    const clone = preview.cloneNode(true);
+    clone.querySelectorAll("mark.find-hl").forEach((m) => {
+      const parent = m.parentNode;
+      while (m.firstChild) parent.insertBefore(m.firstChild, m);
+      parent.removeChild(m);
+    });
+    const md = turndown.turndown(clone.innerHTML);
     const scrollTop = editor.scrollTop;
     editor.value = md;
     editor.scrollTop = scrollTop;
     previewDirty = false;
     updateStats();
     setDirty(true);
+    if (!findBar.classList.contains("hidden")) updateFind();
   } catch (e) {
     console.error("Turndown failed:", e);
   }
@@ -529,9 +545,12 @@ const findCount = document.getElementById("find-count");
 const findPrev = document.getElementById("find-prev");
 const findNext = document.getElementById("find-next");
 const findClose = document.getElementById("find-close");
+const editorHighlight = document.getElementById("editor-highlight");
 
 let findMatches = [];
 let findIndex = -1;
+let editorMarks = [];
+let previewMarks = [];
 
 function computeMatches(query) {
   findMatches = [];
@@ -544,6 +563,102 @@ function computeMatches(query) {
     if (pos === -1) break;
     findMatches.push(pos);
     idx = pos + needle.length;
+  }
+}
+
+function escapeHtml(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function clearEditorHighlights() {
+  editorHighlight.innerHTML = "";
+  editorHighlight.classList.add("hidden");
+  editorMarks = [];
+}
+
+function clearPreviewHighlights() {
+  const marks = preview.querySelectorAll("mark.find-hl");
+  marks.forEach((m) => {
+    const parent = m.parentNode;
+    while (m.firstChild) parent.insertBefore(m.firstChild, m);
+    parent.removeChild(m);
+  });
+  preview.normalize();
+  previewMarks = [];
+}
+
+function applyEditorHighlights(query) {
+  editorHighlight.classList.remove("hidden");
+  const text = editor.value;
+  if (!query) {
+    editorHighlight.innerHTML = escapeHtml(text) + "\n";
+    editorMarks = [];
+    editorHighlight.scrollTop = editor.scrollTop;
+    return;
+  }
+  const needle = query.toLowerCase();
+  const haystack = text.toLowerCase();
+  let html = "";
+  let last = 0;
+  let pos = 0;
+  while (true) {
+    const f = haystack.indexOf(needle, pos);
+    if (f === -1) break;
+    html += escapeHtml(text.slice(last, f));
+    html += `<mark class="find-hl">${escapeHtml(text.slice(f, f + query.length))}</mark>`;
+    last = f + query.length;
+    pos = last;
+  }
+  html += escapeHtml(text.slice(last)) + "\n";
+  editorHighlight.innerHTML = html;
+  editorMarks = Array.from(editorHighlight.querySelectorAll("mark.find-hl"));
+  editorHighlight.scrollTop = editor.scrollTop;
+}
+
+function applyPreviewHighlights(query) {
+  clearPreviewHighlights();
+  if (!query) return;
+  const needle = query.toLowerCase();
+  const walker = document.createTreeWalker(preview, NodeFilter.SHOW_TEXT, null);
+  const nodes = [];
+  let node;
+  while ((node = walker.nextNode())) {
+    if (node.nodeValue) nodes.push(node);
+  }
+  for (const tn of nodes) {
+    const value = tn.nodeValue;
+    const lower = value.toLowerCase();
+    let idx = 0;
+    const ranges = [];
+    while (true) {
+      const f = lower.indexOf(needle, idx);
+      if (f === -1) break;
+      ranges.push([f, f + needle.length]);
+      idx = f + needle.length;
+    }
+    if (ranges.length === 0) continue;
+    const frag = document.createDocumentFragment();
+    let cursor = 0;
+    for (const [s, e] of ranges) {
+      if (s > cursor) frag.appendChild(document.createTextNode(value.slice(cursor, s)));
+      const m = document.createElement("mark");
+      m.className = "find-hl";
+      m.textContent = value.slice(s, e);
+      frag.appendChild(m);
+      cursor = e;
+    }
+    if (cursor < value.length) frag.appendChild(document.createTextNode(value.slice(cursor)));
+    tn.parentNode.replaceChild(frag, tn);
+  }
+  previewMarks = Array.from(preview.querySelectorAll("mark.find-hl"));
+}
+
+function updateActiveHighlight() {
+  editorMarks.forEach((m, i) => m.classList.toggle("active", i === findIndex));
+  previewMarks.forEach((m, i) => m.classList.toggle("active", i === findIndex));
+  const pm = previewMarks[findIndex];
+  if (pm && typeof pm.scrollIntoView === "function") {
+    pm.scrollIntoView({ block: "nearest", inline: "nearest" });
   }
 }
 
@@ -602,6 +717,8 @@ function closeFindBar() {
   findBar.classList.add("hidden");
   findMatches = [];
   findIndex = -1;
+  clearEditorHighlights();
+  clearPreviewHighlights();
   editor.focus();
 }
 
@@ -615,6 +732,9 @@ function updateFind() {
     findIndex = findMatches.findIndex((p) => p >= caret);
     if (findIndex === -1) findIndex = 0;
   }
+  applyEditorHighlights(q);
+  applyPreviewHighlights(q);
+  updateActiveHighlight();
   renderFindCount();
   selectCurrentMatch();
 }
@@ -622,6 +742,7 @@ function updateFind() {
 function stepFind(delta) {
   if (!findMatches.length) return;
   findIndex = (findIndex + delta + findMatches.length) % findMatches.length;
+  updateActiveHighlight();
   renderFindCount();
   selectCurrentMatch();
 }
