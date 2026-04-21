@@ -725,13 +725,7 @@ function closeFindBar() {
 function updateFind() {
   const q = findInput.value;
   computeMatches(q);
-  if (findMatches.length === 0) {
-    findIndex = -1;
-  } else {
-    const caret = editor.selectionStart;
-    findIndex = findMatches.findIndex((p) => p >= caret);
-    if (findIndex === -1) findIndex = 0;
-  }
+  findIndex = findMatches.length === 0 ? -1 : 0;
   applyEditorHighlights(q);
   applyPreviewHighlights(q);
   updateActiveHighlight();
