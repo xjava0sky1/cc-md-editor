@@ -190,7 +190,7 @@ body {
 
 .split {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, var(--left-fr, 1fr)) var(--gutter-w, 6px) minmax(0, var(--right-fr, 1fr));
   overflow: hidden;
   min-height: 0;
 }
@@ -199,9 +199,32 @@ body {
   position: relative;
   min-height: 0;
   overflow: hidden;
-  border-right: 1px solid var(--border);
   background: var(--bg);
 }
+
+.gutter {
+  background: var(--border);
+  cursor: col-resize;
+  -webkit-user-select: none;
+  user-select: none;
+  position: relative;
+  transition: background 0.1s;
+}
+.gutter:hover,
+.gutter.dragging { background: var(--accent); }
+.gutter::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -3px;
+  right: -3px;
+}
+body.resizing-split,
+body.resizing-split * { cursor: col-resize !important; }
+body.resizing-split iframe,
+body.resizing-split #preview,
+body.resizing-split #editor { pointer-events: none; }
 
 #editor {
   resize: none;
