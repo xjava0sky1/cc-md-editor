@@ -21,7 +21,7 @@ Po prvním spuštění už se appka otevírá normálně.
 - Live preview vedle editoru
 - Toolbar pro základní Markdown (H1–H3, bold, italic, code, link, list, quote, table, hr)
 - Taby pro víc otevřených souborů
-- Find bar (⌘F)
+- Find bar (⌘F) se zvýrazněním všech nálezů v editoru i v preview
 - Asociace s `.md` / `.markdown` soubory
 - Zkratky: ⌘O otevřít, ⌘S uložit, ⌘W zavřít tab, ⌘B bold, ⌘I italic, ⌘K link
 
