@@ -10,11 +10,17 @@ Nativní Markdown editor pro macOS, postavený na [Tauri](https://tauri.app) (Ru
 
 1. Stáhni si nejnovější `.dmg` z [Releases](../../releases/latest).
 2. Otevři `.dmg` a přetáhni **MD Editor** do složky *Applications*.
-3. **Při prvním spuštění:** macOS řekne „MD Editor nelze otevřít, protože Apple nemůže ověřit vývojáře“. Je to proto, že appka není notarizovaná u Applu. Obejdi to takhle:
-   - V Applications klikni na **MD Editor** pravým tlačítkem → **Open** → v dialogu znovu **Open**.
-   - Nebo v Terminálu: `xattr -cr "/Applications/MD Editor.app"`
+3. **Odblokuj appku** — tohle je potřeba vždycky při prvním stažení, jinak macOS ukáže hlášku `„MD Editor" je poškozena a nelze ji otevřít` (appka není rozbitá, je to jen Gatekeeper, protože není notarizovaná u Apple). V Terminálu spusť:
 
-Po prvním spuštění už se appka otevírá normálně.
+   ```bash
+   xattr -cr "/Applications/MD Editor.app"
+   ```
+
+   Potom už spouštěj appku normálně — z Applications, Launchpadu, nebo Spotlightu.
+
+> Obcházka „klik pravým → Open" na novějších macOS (Sonoma/Sequoia) obvykle nefunguje a rovnou hodí hlášku o poškození. Používej terminálový příkaz výše.
+
+Po odblokování už se appka otevírá normálně. Při každém novém releasu je třeba příkaz spustit znovu (nová `.app` = nová karanténa).
 
 ## Funkce
 

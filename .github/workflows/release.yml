@@ -31,11 +31,19 @@ jobs:
           cat > /tmp/install.md <<'INSTALL_EOF'
           ## Instalace
 
-          1. Stáhni `.dmg` níže.
-          2. Otevři ho a přetáhni MD Editor do Applications.
-          3. **Při prvním spuštění**: klikni na appku pravým tlačítkem → **Open** → v dialogu znovu **Open**. (Appka není notarizovaná u Apple, proto ten extra krok.)
-
           Pro macOS 11+ na Apple Silicon (M1/M2/M3/M4).
+
+          1. Stáhni `.dmg` níže.
+          2. Otevři ho a přetáhni **MD Editor** do Applications.
+          3. **Odblokuj appku** (povinný krok — jinak macOS ukáže `„MD Editor" je poškozena a nelze ji otevřít`). Appka není rozbitá, je to Gatekeeper, protože build není notarizovaný u Apple. V Terminálu spusť:
+
+             ```bash
+             xattr -cr "/Applications/MD Editor.app"
+             ```
+
+          4. Otevři **MD Editor** normálně z Applications / Launchpadu / Spotlightu.
+
+          > Obcházka „klik pravým → Open" na novějších macOS (Sonoma/Sequoia) obvykle nefunguje — použij terminálový příkaz výše. Příkaz je potřeba spustit znovu při každém novém releasu.
 
           INSTALL_EOF
 
