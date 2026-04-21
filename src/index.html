@@ -32,7 +32,10 @@
   <div class="tabbar" id="tabbar" role="tablist"></div>
 
   <main class="split">
-    <textarea id="editor" spellcheck="false" placeholder="# Start typing…"></textarea>
+    <div class="editor-wrap">
+      <div id="editor-highlight" class="editor-highlight" aria-hidden="true"></div>
+      <textarea id="editor" spellcheck="false" placeholder="# Start typing…"></textarea>
+    </div>
     <div id="preview" class="markdown-body" contenteditable="true" spellcheck="false"></div>
     <div id="find-bar" class="find-bar hidden" role="search">
       <input id="find-input" type="text" placeholder="Find" spellcheck="false" autocomplete="off" />
