@@ -247,6 +247,7 @@ function newTab() {
   loadTabToEditor(t);
   renderTabs();
   persistTabs();
+  resetSplit();
   editor.focus();
 }
 
@@ -322,10 +323,12 @@ async function openViaDialog() {
     });
     if (!picked) return;
     const list = Array.isArray(picked) ? picked : [picked];
+    let opened = false;
     for (const item of list) {
       const path = typeof item === "string" ? item : item.path ?? item;
-      if (path) await openFile(path);
+      if (path) opened = (await openFile(path)) || opened;
     }
+    if (opened) resetSplit();
   } catch (e) {
     console.error("Open dialog failed:", e);
   }
@@ -829,6 +832,76 @@ async function restoreSession(initialPath) {
   renderTabs();
   persistTabs();
 }
+
+const SPLIT_KEY = "split-ratio";
+
+function applySplitRatio(r) {
+  const split = document.querySelector(".split");
+  if (!split) return;
+  const clamped = Math.min(0.9, Math.max(0.1, r));
+  split.style.setProperty("--left-fr", `${clamped}fr`);
+  split.style.setProperty("--right-fr", `${1 - clamped}fr`);
+}
+
+function resetSplit() {
+  applySplitRatio(0.5);
+  localStorage.setItem(SPLIT_KEY, "0.5");
+}
+
+function setupSplitResize() {
+  const split = document.querySelector(".split");
+  const gutter = document.getElementById("gutter");
+  if (!split || !gutter) return;
+
+  const MIN_PX = 160;
+
+  const saved = parseFloat(localStorage.getItem(SPLIT_KEY));
+  if (Number.isFinite(saved)) applySplitRatio(saved);
+
+  let dragging = false;
+  let pointerId = null;
+
+  const onMove = (e) => {
+    if (!dragging) return;
+    const rect = split.getBoundingClientRect();
+    const gutterW = gutter.getBoundingClientRect().width || 6;
+    const available = rect.width - gutterW;
+    if (available <= 0) return;
+    let leftPx = e.clientX - rect.left - gutterW / 2;
+    leftPx = Math.min(available - MIN_PX, Math.max(MIN_PX, leftPx));
+    applySplitRatio(leftPx / available);
+  };
+
+  const onUp = () => {
+    if (!dragging) return;
+    dragging = false;
+    gutter.classList.remove("dragging");
+    document.body.classList.remove("resizing-split");
+    if (pointerId !== null) {
+      try { gutter.releasePointerCapture(pointerId); } catch {}
+      pointerId = null;
+    }
+    const left = parseFloat(split.style.getPropertyValue("--left-fr"));
+    if (Number.isFinite(left)) localStorage.setItem(SPLIT_KEY, String(left));
+  };
+
+  gutter.addEventListener("pointerdown", (e) => {
+    if (e.button !== 0) return;
+    dragging = true;
+    pointerId = e.pointerId;
+    gutter.setPointerCapture(pointerId);
+    gutter.classList.add("dragging");
+    document.body.classList.add("resizing-split");
+    e.preventDefault();
+  });
+  gutter.addEventListener("pointermove", onMove);
+  gutter.addEventListener("pointerup", onUp);
+  gutter.addEventListener("pointercancel", onUp);
+
+  gutter.addEventListener("dblclick", resetSplit);
+}
+
+setupSplitResize();
 
 invoke("take_initial_file")
   .then((path) => restoreSession(path))
