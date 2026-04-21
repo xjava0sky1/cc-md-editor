@@ -9,7 +9,8 @@
     "watch:js": "mkdir -p dist && cp src/index.html src/styles.css dist/ && esbuild src/main.js --bundle --outfile=dist/bundle.js --format=esm --platform=browser --watch",
     "tauri": "tauri",
     "dev": "tauri dev",
-    "build": "tauri build"
+    "build": "tauri build",
+    "install:local": "bash scripts/install-local.sh"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2.10.1",
