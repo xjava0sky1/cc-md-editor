@@ -319,11 +319,54 @@ body.resizing-split #editor { pointer-events: none; }
   padding: 12px 14px;
   border-radius: 6px;
   overflow: auto;
+  position: relative;
 }
 #preview pre code {
   background: transparent;
   padding: 0;
   font-size: 0.9em;
+}
+
+.code-copy-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.6;
+  transition: opacity 0.12s, background 0.1s, color 0.1s, border-color 0.1s;
+  -webkit-user-select: none;
+  user-select: none;
+  z-index: 2;
+}
+.code-copy-btn svg {
+  width: 14px;
+  height: 14px;
+  display: block;
+}
+#preview pre:hover .code-copy-btn,
+.code-copy-btn:hover,
+.code-copy-btn:focus-visible,
+.code-copy-btn.copied {
+  opacity: 1;
+}
+.code-copy-btn:hover {
+  background: var(--panel-2);
+  color: var(--text);
+  border-color: #4a4a4a;
+}
+.code-copy-btn.copied {
+  color: #6cc070;
+  border-color: #6cc070;
 }
 #preview blockquote {
   margin: 0.8em 0;
