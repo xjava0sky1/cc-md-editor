@@ -64,8 +64,29 @@ function setDirty(flag) {
   renderTabs();
 }
 
+const COPY_ICON_SVG =
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+const CHECK_ICON_SVG =
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+
+function addCodeCopyButtons() {
+  const blocks = preview.querySelectorAll("pre");
+  for (const pre of blocks) {
+    if (pre.querySelector(":scope > .code-copy-btn")) continue;
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "code-copy-btn";
+    btn.contentEditable = "false";
+    btn.title = "Copy code";
+    btn.setAttribute("aria-label", "Copy code");
+    btn.innerHTML = COPY_ICON_SVG;
+    pre.insertBefore(btn, pre.firstChild);
+  }
+}
+
 function renderPreview() {
   preview.innerHTML = DOMPurify.sanitize(marked.parse(editor.value || ""));
+  addCodeCopyButtons();
   if (findBar && !findBar.classList.contains("hidden") && findInput.value) {
     applyPreviewHighlights(findInput.value);
     updateActiveHighlight();
@@ -466,6 +487,7 @@ let previewDirty = false;
 function syncPreviewToEditor() {
   try {
     const clone = preview.cloneNode(true);
+    clone.querySelectorAll(".code-copy-btn").forEach((b) => b.remove());
     clone.querySelectorAll("mark.find-hl").forEach((m) => {
       const parent = m.parentNode;
       while (m.firstChild) parent.insertBefore(m.firstChild, m);
@@ -483,6 +505,34 @@ function syncPreviewToEditor() {
     console.error("Turndown failed:", e);
   }
 }
+
+preview.addEventListener("click", (e) => {
+  const btn = e.target.closest(".code-copy-btn");
+  if (!btn) return;
+  e.preventDefault();
+  e.stopPropagation();
+  const pre = btn.closest("pre");
+  if (!pre) return;
+  const code = pre.querySelector("code");
+  const text = code
+    ? code.textContent
+    : Array.from(pre.childNodes)
+        .filter((n) => n !== btn)
+        .map((n) => n.textContent ?? "")
+        .join("");
+  const showCopied = () => {
+    btn.classList.add("copied");
+    btn.innerHTML = CHECK_ICON_SVG;
+    setTimeout(() => {
+      btn.classList.remove("copied");
+      btn.innerHTML = COPY_ICON_SVG;
+    }, 1200);
+  };
+  navigator.clipboard
+    .writeText(text)
+    .then(showCopied)
+    .catch((err) => console.error("Copy failed:", err));
+});
 
 preview.addEventListener("input", () => {
   previewDirty = true;
