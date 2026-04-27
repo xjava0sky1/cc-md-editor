@@ -20,7 +20,7 @@
     "@joplin/turndown-plugin-gfm": "^1.0.64",
     "@tauri-apps/api": "^2.10.1",
     "@tauri-apps/plugin-dialog": "^2.7.0",
-    "dompurify": "^3.4.0",
+    "dompurify": "^3.4.1",
     "marked": "^18.0.2",
     "turndown": "^7.2.4"
   }
