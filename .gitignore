@@ -14,5 +14,9 @@ src-tauri/target/
 # Claude Code local settings
 .claude/
 
+# Local session management
+tasks/
+PROGRESS.md.archived-*
+
 # Tauri generated schema
 src-tauri/gen/schemas/
