@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "build:js": "mkdir -p dist && cp src/index.html src/styles.css dist/ && esbuild src/main.js --bundle --outfile=dist/bundle.js --format=esm --platform=browser",
-    "watch:js": "mkdir -p dist && cp src/index.html src/styles.css dist/ && esbuild src/main.js --bundle --outfile=dist/bundle.js --format=esm --platform=browser --watch",
+    "watch:js": "mkdir -p dist && cp src/index.html src/styles.css dist/ && esbuild src/main.js --bundle --outfile=dist/bundle.js --format=esm --platform=browser --watch & node scripts/watch-assets.mjs",
     "tauri": "tauri",
     "dev": "tauri dev",
     "build": "tauri build",
