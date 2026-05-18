@@ -129,6 +129,7 @@ function loadTabToEditor(tab) {
     editor.setSelectionRange(tab.selStart ?? 0, tab.selEnd ?? 0);
   } catch {}
   editor.scrollTop = tab.scrollTop ?? 0;
+  preview.scrollTop = 0;
   statPath.textContent = tab.path ?? "";
   refreshTitle();
 }
