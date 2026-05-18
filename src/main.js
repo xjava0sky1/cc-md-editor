@@ -7,6 +7,7 @@ import { marked } from "marked";
 import TurndownService from "turndown";
 import { gfm } from "@joplin/turndown-plugin-gfm";
 import DOMPurify from "dompurify";
+import hljs from "highlight.js/lib/common";
 
 const editor = document.getElementById("editor");
 const preview = document.getElementById("preview");
@@ -18,6 +19,15 @@ const appWindow = getCurrentWindow();
 const appWebview = getCurrentWebview();
 
 marked.setOptions({ gfm: true, breaks: false });
+marked.use({
+  renderer: {
+    code({ text, lang }) {
+      const language = (lang && hljs.getLanguage(lang)) ? lang : "plaintext";
+      const highlighted = hljs.highlight(text, { language }).value;
+      return `<pre><code class="hljs language-${language}">${highlighted}</code></pre>\n`;
+    },
+  },
+});
 
 const turndown = new TurndownService({
   headingStyle: "atx",

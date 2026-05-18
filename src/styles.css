@@ -472,3 +472,19 @@ body.resizing-split #editor { pointer-events: none; }
 .find-btn:hover { background: var(--panel-2); }
 .find-btn:disabled { opacity: 0.35; cursor: default; }
 .find-btn:disabled:hover { background: transparent; }
+
+/* highlight.js — atom-one-dark adapted to match app theme */
+.hljs { background: transparent; color: #abb2bf; }
+.hljs-comment, .hljs-quote { color: #5c6370; font-style: italic; }
+.hljs-keyword, .hljs-selector-tag, .hljs-doctag, .hljs-formula { color: #c678dd; font-weight: bold; }
+.hljs-section, .hljs-name, .hljs-deletion, .hljs-subst { color: #e06c75; }
+.hljs-literal, .hljs-type, .hljs-selector-id { color: #56b6c2; }
+.hljs-string, .hljs-regexp, .hljs-addition, .hljs-meta .hljs-string { color: #98c379; }
+.hljs-attr, .hljs-variable, .hljs-template-variable, .hljs-number,
+.hljs-selector-attr, .hljs-selector-pseudo { color: #d19a66; }
+.hljs-built_in, .hljs-title.class_, .hljs-class .hljs-title { color: #e6c07b; }
+.hljs-symbol, .hljs-bullet, .hljs-link, .hljs-meta,
+.hljs-selector-class, .hljs-title { color: #61aeee; }
+.hljs-emphasis { font-style: italic; }
+.hljs-strong { font-weight: bold; }
+.hljs-link { text-decoration: underline; }
