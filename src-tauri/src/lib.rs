@@ -71,13 +71,15 @@ pub fn run() {
                 for url in urls {
                     if let Ok(path) = url.to_file_path() {
                         let path_str = path.to_string_lossy().to_string();
-                        if app_handle.emit("open-file", path_str.clone()).is_err() {
-                            if let Some(state) = app_handle.try_state::<InitialFile>() {
-                                if let Ok(mut g) = state.0.lock() {
-                                    *g = Some(path_str);
-                                }
+                        // Always store for cold-start — emit() returns Ok even if the JS
+                        // listener isn't registered yet, so we can't rely on its result.
+                        if let Some(state) = app_handle.try_state::<InitialFile>() {
+                            if let Ok(mut g) = state.0.lock() {
+                                *g = Some(path_str.clone());
                             }
                         }
+                        // Also emit for already-running instances where JS is ready.
+                        let _ = app_handle.emit("open-file", path_str);
                     }
                 }
             }
